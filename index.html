@@ -1,0 +1,292 @@
+      <!doctype html>
+     <html lang="en">
+     <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Math Whiz</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="assets/favicon.ico">
+    <link rel="icon" href="assets/favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Math Whiz">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="msapplication-TileColor" content="#2563eb">
+    <meta name="msapplication-TileImage" content="assets/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Baloo 2', cursive;
+            overscroll-behavior: none;
+        }
+        .timer-bar-inner {
+            transition: width 1s linear;
+        }
+        @keyframes fire-flicker {
+            0%, 100% { transform: scale(1) rotate(-1deg); }
+            50% { transform: scale(1.05) rotate(1deg); }
+        }
+        .on-fire {
+            animation: fire-flicker 1s ease-in-out infinite;
+        }
+        @keyframes icon-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .icon-container svg {
+            animation: icon-float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-500 to-teal-600 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app-container" class="w-full max-w-2xl mx-auto bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8 text-center text-slate-800 relative">
+
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <div class="icon-container w-32 h-32 mx-auto mb-4">
+                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600">
+                    <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"></path>
+                    <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path>
+                    <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-700 mb-2">Math Whiz</h1>
+            <p class="text-lg md:text-xl text-slate-600 mb-6">Ready for a random challenge? Hit play to start!</p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button id="start-btn" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                    Play
+                </button>
+            </div>
+             <p class="mt-8 text-sm text-slate-500">Created by <a href="http://Dhruv.ftp.sh" target="_blank" class="text-blue-600 hover:underline">Dhruv Gowda</a></p>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden">
+             <div class="flex justify-between items-center mb-4 flex-wrap gap-2 absolute top-4 left-4 right-4">
+                <div class="text-lg font-bold">High Score: <span id="high-score-display" class="text-purple-600">0</span></div>
+                 <button id="stop-btn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform hover:scale-105">Stop</button>
+            </div>
+            
+            <div class="mt-16">
+                 <div class="text-2xl font-bold">Score: <span id="score-display" class="text-green-600">0</span></div>
+                <div id="timer" class="w-full bg-gray-300 rounded-full h-4 my-4 shadow-inner">
+                    <div id="timer-bar" class="bg-blue-400 h-4 rounded-full timer-bar-inner"></div>
+                </div>
+                <div id="question-container" class="bg-blue-100 p-8 rounded-xl shadow-md mb-6">
+                    <p id="question-text" class="text-4xl md:text-5xl font-bold"></p>
+                </div>
+                <form id="answer-form">
+                    <input type="number" id="answer-input" class="text-center text-2xl w-full max-w-xs p-3 border-4 border-blue-300 rounded-lg shadow-sm focus:outline-none focus:border-blue-500" placeholder="Your answer..." autocomplete="off">
+                    <button type="submit" class="w-full max-w-xs mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300">Submit</button>
+                </form>
+                 <div id="feedback" class="mt-4 text-2xl font-bold h-8"></div>
+            </div>
+        </div>
+
+        <!-- Session End Screen -->
+         <div id="final-screen" class="hidden">
+            <h2 class="text-3xl md:text-4xl font-bold text-blue-700 mb-4">Practice Complete!</h2>
+            <div class="bg-blue-100 p-6 rounded-xl shadow-md mb-8">
+                 <p class="text-xl">Your Final Score:</p>
+                 <p class="text-5xl font-bold my-2 text-green-600" id="final-score">0</p>
+                 <p class="text-xl mt-4">High Score: <strong id="final-high-score" class="text-purple-600">0</strong></p>
+            </div>
+             <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button id="play-again-btn" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full text-xl shadow-lg transform hover:scale-105 transition-transform duration-300">
+                    Play Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const finalScreen = document.getElementById('final-screen');
+        const startBtn = document.getElementById('start-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const playAgainBtn = document.getElementById('play-again-btn');
+        const answerForm = document.getElementById('answer-form');
+        const answerInput = document.getElementById('answer-input');
+
+        const scoreDisplayEl = document.getElementById('score-display');
+        const highScoreDisplayEl = document.getElementById('high-score-display');
+        const questionText = document.getElementById('question-text');
+        const feedback = document.getElementById('feedback');
+        const timerBar = document.getElementById('timer-bar');
+        
+        const finalScoreEl = document.getElementById('final-score');
+        const finalHighScoreEl = document.getElementById('final-high-score');
+
+        let currentQuestion = {};
+        let score = 0;
+        let highScore = 0;
+        let correctStreak = 0;
+        
+        const BASE_TIME = 15;
+        let timerInterval;
+
+        // --- Event Listeners ---
+        startBtn.addEventListener('click', startGame);
+        stopBtn.addEventListener('click', stopGame);
+        playAgainBtn.addEventListener('click', startGame);
+        answerForm.addEventListener('submit', handleAnswerSubmit);
+
+        // --- Core Functions ---
+        function startGame() {
+            score = 0;
+            correctStreak = 0;
+            loadHighScore();
+            updateDisplay();
+            showScreen('quiz');
+            displayNewQuestion();
+        }
+
+        function stopGame() {
+            clearInterval(timerInterval);
+            saveHighScore();
+            finalScoreEl.textContent = score;
+            finalHighScoreEl.textContent = highScore;
+            showScreen('final');
+        }
+        
+        function generateQuestion() {
+            let question, answer;
+            const rand = Math.random();
+
+            if (rand < 0.34) {
+                // Type 1: 3-Digit Addition
+                const num1 = Math.floor(Math.random() * 900) + 100; // 100-999
+                const num2 = Math.floor(Math.random() * 900) + 100; // 100-999
+                question = `${num1} + ${num2}`;
+                answer = num1 + num2;
+
+            } else if (rand < 0.67) {
+                // Type 2: Multiplication (result is 2 digits)
+                let num1, num2, product;
+                do {
+                    num1 = Math.floor(Math.random() * 11) + 2; // 2-12
+                    num2 = Math.floor(Math.random() * 8) + 2;  // 2-9
+                    product = num1 * num2;
+                } while (product < 10 || product > 99);
+                question = `${num1} × ${num2}`;
+                answer = product;
+
+            } else {
+                // Type 3: 2-Digit Division (whole number answers)
+                const divisor = Math.floor(Math.random() * 11) + 2; // 2-12
+                const quotient = Math.floor(Math.random() * 8) + 2; // 2-9
+                const dividend = divisor * quotient;
+                
+                if (dividend > 99) {
+                    return generateQuestion(); // Reroll if dividend ends up 3 digits
+                }
+                
+                question = `${dividend} ÷ ${divisor}`;
+                answer = quotient;
+            }
+
+            return { question, answer };
+        }
+
+        function displayNewQuestion() {
+            currentQuestion = generateQuestion();
+            questionText.textContent = currentQuestion.question;
+            answerInput.value = '';
+            answerInput.focus();
+            feedback.textContent = '';
+            feedback.className = 'mt-4 text-2xl font-bold h-8';
+            startTimer();
+        }
+
+        function handleAnswerSubmit(e) {
+            e.preventDefault();
+            clearInterval(timerInterval);
+            const userAnswer = parseInt(answerInput.value, 10);
+            if (isNaN(userAnswer)) return;
+            handleAnswer(userAnswer === currentQuestion.answer);
+        }
+
+        function handleAnswer(isCorrect) {
+            if (isCorrect) {
+                score++;
+                correctStreak++;
+                feedback.textContent = 'Correct!';
+                feedback.classList.add('text-green-500');
+            } else {
+                correctStreak = 0;
+                feedback.textContent = `Nope, it was ${currentQuestion.answer}`;
+                feedback.classList.add('text-red-500');
+            }
+
+            if (score > highScore) {
+                highScore = score;
+            }
+
+            updateDisplay();
+            
+            setTimeout(() => {
+                displayNewQuestion();
+            }, 1500);
+        }
+
+        // --- UI & Data Functions ---
+        function updateDisplay() {
+            scoreDisplayEl.textContent = score;
+            highScoreDisplayEl.textContent = highScore;
+        }
+
+        function loadHighScore() {
+            try {
+                highScore = parseInt(localStorage.getItem('mathWhizHighScore_mixed')) || 0;
+            } catch (e) {
+                console.error("Could not access localStorage. High score will not be saved.", e);
+                highScore = 0;
+            }
+        }
+
+        function saveHighScore() {
+             try {
+                if (score > (parseInt(localStorage.getItem('mathWhizHighScore_mixed')) || 0)) {
+                    localStorage.setItem('mathWhizHighScore_mixed', score);
+                }
+            } catch (e) {
+                console.error("Could not access localStorage. High score will not be saved.", e);
+            }
+        }
+        
+        function startTimer() {
+            let timeLeft = BASE_TIME;
+            clearInterval(timerInterval);
+            timerBar.style.width = '100%';
+            timerBar.className = 'bg-blue-400 h-4 rounded-full timer-bar-inner';
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerBar.style.width = `${(timeLeft / BASE_TIME) * 100}%`;
+                if (timeLeft <= BASE_TIME * 0.3) {
+                    timerBar.classList.replace('bg-blue-400', 'bg-red-500');
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleAnswer(false);
+                }
+            }, 1000);
+        }
+
+        function showScreen(screenName) {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            finalScreen.classList.add('hidden');
+            
+            if (screenName === 'start') startScreen.classList.remove('hidden');
+            if (screenName === 'quiz') quizScreen.classList.remove('hidden');
+            if (screenName === 'final') finalScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
+
